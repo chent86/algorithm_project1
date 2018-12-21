@@ -43,9 +43,10 @@ void local_search(data& m_data) {
   init_solution(assignment, facility_used, m_data);
   result = evaluation(assignment, m_data);
   // cout << "init cost: " << result << endl;
-  // check(m_data, assignment);
+  // cout << evaluation(assignment, m_data) << endl;
   int last_update = -1;
-  for(int i = 0; i < 2000; i++) {
+  int times = 2000;
+  for(int i = 0; i < times; i++) {
     int cur = 0;
     int customer;
     int facility;
@@ -76,16 +77,18 @@ void local_search(data& m_data) {
       }
     }
     if(cur < 0) {
-      // cout << "origin: " << assignment[customer] << " new: " << facility << endl;
+      // cout << customer << " origin: " << assignment[customer] << " new: " << facility << endl;
       facility_used[assignment[customer]] -= m_data.customer_demand[customer];
       assignment[customer] = facility;
       facility_used[assignment[customer]] += m_data.customer_demand[customer];
       result += cur;
       // for(auto i: assignment)
       //   cout << i << " ";
-      // cout << endl;
-      // cout << result << " vs ";
-      // check(m_data, assignment);
+      // cout << endl;      
+      // cout << result << " vs " << evaluation(assignment, m_data) << endl;
+      // if(result != evaluation(assignment, m_data)) {
+      //   return;
+      // }
       last_update = i;
       // cout << i << " : " << result << endl;
     }
@@ -97,7 +100,7 @@ void local_search(data& m_data) {
   // for(auto i: assignment)
   //   cout << i << " ";
   // cout << endl;
-  cout << "HC final cost: " << result << " last update: " << last_update << " check: " << evaluation(assignment, m_data) << endl;
+  cout << "HC final cost: " << result << " total times: " << times << " last update: " << last_update << " check: " << evaluation(assignment, m_data) << endl;
   // check(m_data, assignment);
   // cout << "check result..." << endl;
   // check(assignment, m_data);
