@@ -4,6 +4,12 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "string": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "xlocale": "cpp",
+        "cmath": "cpp",
+        "ostream": "cpp",
+        "initializer_list": "cpp",
+        "type_traits": "cpp",
+        "ios": "cpp"
     }
 }

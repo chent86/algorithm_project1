@@ -4,35 +4,20 @@ int get_random(int range) {
   return rand()%range;
 }
 
-int evaluation(vector<int>& assignment, vector<int>& facility_used, data& m_data) {
-  int result;
-  for(int i = 0; i < facility_used.size(); i++) {
-    if(facility_used[i] != 0)
+int evaluation(vector<int>& assignment, data& m_data) {
+  int result = 0; // 要记得初始化
+  vector<int> facility_status(m_data.facility_num, 0);
+  for(int i = 0; i < assignment.size(); i++) {
+    facility_status[assignment[i]] = 1;
+  }
+  for(int i = 0; i < facility_status.size(); i++) {
+    if(facility_status[i] != 0)
       result += m_data.facility_opening_cost[i];
   }
   for(int i = 0; i < assignment.size(); i++) {
     result += m_data.assignment_cost[assignment[i]][i];
   }
   return result;
-}
-
-void check(vector<int>& assignment, data& m_data) {
-  int result = 0;
-  vector<int> used(m_data.facility_num, 0);
-  vector<int> status(m_data.facility_num, 0);
-  for(int i = 0; i < assignment.size(); i++) {
-    result += m_data.assignment_cost[assignment[i]][i];
-    used[assignment[i]] += m_data.customer_demand[i];
-    status[assignment[i]] = 1;
-  }
-  for(int i = 0; i < status.size(); i++) {
-    if(status[i] == 1)
-      result += m_data.facility_opening_cost[i];
-  }
-  for(auto i: used)
-    cout << i << " ";
-  cout << endl;
-  cout << "it should be: " <<  result << endl;
 }
 
 void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data) {
@@ -47,11 +32,6 @@ void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_
       }
     }
   }
-
-  // cout << "init solution:" << endl;
-  // for(auto i: facility_used)
-  //   cout << i << " ";
-  // cout << endl;
 }
 
 void local_search(data& m_data) {
@@ -60,14 +40,10 @@ void local_search(data& m_data) {
   vector<int> assignment(m_data.customer_num, 0);
   vector<int> facility_used(m_data.facility_num, 0);
 
-  // cout << "facility capacity:" << endl;
-  // for(auto i: m_data.facility_capacity)
-  //   cout << i << " ";
-  // cout << endl;
   init_solution(assignment, facility_used, m_data);
-  result = evaluation(assignment, facility_used, m_data);
+  result = evaluation(assignment, m_data);
   // cout << "init cost: " << result << endl;
-
+  // check(m_data, assignment);
   int last_update = -1;
   for(int i = 0; i < 2000; i++) {
     int cur = 0;
@@ -80,7 +56,8 @@ void local_search(data& m_data) {
         // 得到一个可执行的调整（不超过最大容量）
         tmp_customer = get_random(m_data.customer_num);
         tmp_facility = get_random(m_data.facility_num);
-        if(m_data.facility_capacity[tmp_facility]-facility_used[tmp_facility] >= m_data.customer_demand[tmp_customer])
+        if(m_data.facility_capacity[tmp_facility]-facility_used[tmp_facility] >= m_data.customer_demand[tmp_customer] 
+        && tmp_facility != assignment[tmp_customer]) // 要避开调度到同一个工厂的情况(相当于没调动，而且会出bug)
           break;
       }
       int tmp_result = m_data.assignment_cost[tmp_facility][tmp_customer]-m_data.assignment_cost[assignment[tmp_customer]][tmp_customer];
@@ -99,10 +76,16 @@ void local_search(data& m_data) {
       }
     }
     if(cur < 0) {
+      // cout << "origin: " << assignment[customer] << " new: " << facility << endl;
       facility_used[assignment[customer]] -= m_data.customer_demand[customer];
       assignment[customer] = facility;
       facility_used[assignment[customer]] += m_data.customer_demand[customer];
       result += cur;
+      // for(auto i: assignment)
+      //   cout << i << " ";
+      // cout << endl;
+      // cout << result << " vs ";
+      // check(m_data, assignment);
       last_update = i;
       // cout << i << " : " << result << endl;
     }
@@ -114,7 +97,8 @@ void local_search(data& m_data) {
   // for(auto i: assignment)
   //   cout << i << " ";
   // cout << endl;
-  cout << "final cost: " << result << " last update: " << last_update << endl;
+  cout << "HC final cost: " << result << " last update: " << last_update << " check: " << evaluation(assignment, m_data) << endl;
+  // check(m_data, assignment);
   // cout << "check result..." << endl;
   // check(assignment, m_data);
 }
