@@ -22,29 +22,11 @@ int evaluation(vector<int>& assignment, data& m_data) {
 }
 
 // 随机得到一个初始的合法解
-void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data, vector<int>& m_random) {
-  // for(int i = 0; i < m_data.customer_num; i++) {
-  //   while(true) {
-  //     int facility = get_random(m_data.facility_num);
-  //     if(m_data.facility_capacity[facility]-facility_used[facility] >= m_data.customer_demand[i]) {
-  //       assignment[i] = facility;
-  //       facility_used[facility] += m_data.customer_demand[i];
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // for(int i = 0; i < m_data.customer_num; i++) {
-  //   for(int j = 0; j < m_data.facility_num; j++) {
-  //     int facility = j;
-  //     if(m_data.facility_capacity[facility]-facility_used[facility] >= m_data.customer_demand[i]) {
-  //       assignment[i] = facility;
-  //       facility_used[facility] += m_data.customer_demand[i];
-  //       break;
-  //     }
-  //   }
-  // }
+bool init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data, vector<int>& m_random) {
+  // 随机选择一个商店，顺序安排顾客，容量满了之后再随机选择另一个商店，重复这个过程
+  // 初始解中未开放的商店意味着永远关闭，后续不会安排顾客过去
   int p = get_random(m_data.facility_num);
+  m_random.push_back(p);
   for(int i = 0; i < m_data.customer_num; i++) {
     while(true) {
       int facility = p;
@@ -53,19 +35,24 @@ void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_
         facility_used[facility] += m_data.customer_demand[i];
         break;
       } else {
-        m_random[p] = 0;
         while(true) {
           p = get_random(m_data.facility_num);
-          if(m_random[p] != 0)
+          if(find(m_random.begin(), m_random.end(), p) == m_random.end()) {
+            m_random.push_back(p);
             break;
+          }
+          if(m_random.size() == m_data.facility_num)
+            return false; // 当前的策略导致无法安排完所有顾客，抛弃此次初始解
         }
       }
     }
   }
+  return true;
 }
 
 bool can_open(int facility, vector<int>& m_random) {
-  if(m_random[facility] == 0)
+  // 初始时开放的商店才能继续使用，其余的商店不再开放
+  if(find(m_random.begin(), m_random.end(), facility) != m_random.end())
     return true;
   else
     return false;
@@ -81,8 +68,13 @@ int local_search(data& m_data) {
     vector<int> facility_status(m_data.facility_num, 0);
     vector<int> assignment(m_data.customer_num, 0);
     vector<int> facility_used(m_data.facility_num, 0);
-    vector<int> m_random(m_data.facility_num, 1);
-    init_solution(assignment, facility_used, m_data, m_random); // 获得一个初始解
+    vector<int> m_random;
+    // 获得一个初始解
+    // 如果求解异常，跳过这次执行
+    if(!init_solution(assignment, facility_used, m_data, m_random)) {
+      x--;
+      continue;
+    } 
     result = evaluation(assignment, m_data);
     int last_update = -1;
     int times = 500;
@@ -99,7 +91,9 @@ int local_search(data& m_data) {
           // 得到一个可执行的调整（不超过最大容量）
           tmp_customer = get_random(m_data.customer_num);
           tmp_facility = get_random(m_data.facility_num);
-          if(facility_used[tmp_facility] == 0 && !can_open(tmp_facility, m_random))
+          // 不选取关闭的商店
+          // 第一个初始解开放所有的商店
+          if(facility_used[tmp_facility] == 0 && !can_open(tmp_facility, m_random) && x != 0)
             continue;
           if(m_data.facility_capacity[tmp_facility]-facility_used[tmp_facility] >= m_data.customer_demand[tmp_customer] 
           && tmp_facility != assignment[tmp_customer]) // 要避开调度到同一个商店的情况(相当于没调动，而且会出bug)

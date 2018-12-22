@@ -6,7 +6,7 @@ int SA(data& m_data) {
   int final_times;
   int final_last_update;
 
-  for(int x = 0; x < 10; x++) {
+  for(int x = 0; x < 5; x++) {
     int result = 0;
     float T = 10000;        // 初温
     float min_T = 0.00001;  // 末温
@@ -14,9 +14,12 @@ int SA(data& m_data) {
     vector<int> facility_status(m_data.facility_num, 0);
     vector<int> assignment(m_data.customer_num, 0);
     vector<int> facility_used(m_data.facility_num, 0);
-    vector<int> m_random(m_data.facility_num, 1);
+    vector<int> m_random;
 
-    init_solution(assignment, facility_used, m_data, m_random); // 随机得到一个合法的初始解
+    if(!init_solution(assignment, facility_used, m_data, m_random)) {
+      x--;
+      continue;
+    } 
     result = evaluation(assignment, m_data);
     // cout << "init cost: " << result << endl;
 
@@ -30,7 +33,9 @@ int SA(data& m_data) {
         // 得到一个可执行的调整（不超过最大容量）
         customer = get_random(m_data.customer_num);
         facility = get_random(m_data.facility_num);
-        if(facility_used[facility] == 0 && !can_open(facility, m_random))
+        // 不选取关闭的商店
+        // 第一个初始解开放所有的商店
+        if(facility_used[facility] == 0 && !can_open(facility, m_random) && x != 0)
           continue;        
         if(m_data.facility_capacity[facility]-facility_used[facility] >= m_data.customer_demand[customer]
         && facility != assignment[customer]) // 要避开调度到同一个商店的情况(相当于没调动，而且会出bug)
@@ -71,6 +76,7 @@ int SA(data& m_data) {
       final_times = i;
       final_last_update = last_update;
       m_data.assignment = assignment;
+      m_data.facility_used = facility_used;
     }
   }
   cout << "SA final cost: " << final_result << " total times: " << final_times << " last update: " << final_last_update << " check: " << evaluation(m_data.assignment, m_data) << endl;

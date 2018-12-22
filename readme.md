@@ -13,6 +13,7 @@ The total demand assigned to a facility must not exceedits capacity.
 
 ## blog
 
+https://blog.csdn.net/chent86/article/details/85177963
 
 ## quick start
 
