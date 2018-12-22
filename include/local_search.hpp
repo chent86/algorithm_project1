@@ -16,4 +16,6 @@ int get_random(int range);
 
 int evaluation(vector<int>& assignment, data& m_data);
 
+bool can_open(int facility, vector<int>& m_random);
+
 #endif

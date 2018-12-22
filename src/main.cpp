@@ -35,7 +35,7 @@ int main () {
   //   HC_detail << endl;
 
   //   startTime = clock();
-  //   result = SA(m_data);
+  //   int result = SA(m_data);
   //   endTime = clock();
   //   SA_result << "p" << to_string(i) << " " << to_string(result) << " " << to_string((double)(endTime - startTime)/CLOCKS_PER_SEC) << endl;
   //   SA_detail << "[p" << to_string(i) << "]" << endl;
