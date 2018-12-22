@@ -8,7 +8,7 @@
 #include "define.hpp"
 using namespace std;
 
-void local_search(data& m_data);
+int local_search(data& m_data);
 
 void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data);
 

@@ -7,4 +7,4 @@
 #include "define.hpp"
 using namespace std;
 
-void SA(data& m_data);
+int SA(data& m_data);
