@@ -1,6 +1,6 @@
 # project
 
-Suppose there are n facilities and m customers. We wishto choose:
+Suppose there are n facilities and m customers. We wish to choose:
 (1) which of the n facilities to open
 (2) the assignment of customers to facilities
 The objective is to minimize the sum of the opening costand the assignment cost.
@@ -13,3 +13,11 @@ The total demand assigned to a facility must not exceedits capacity.
 
 ## blog
 
+
+## quick start
+
+(linux is recommended)
+```bash
+make
+bin/main
+```

@@ -10,7 +10,7 @@ using namespace std;
 
 int local_search(data& m_data);
 
-void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data);
+void init_solution(vector<int>& assignment, vector<int>& facility_used, data& m_data, vector<int>& m_random);
 
 int get_random(int range);
 

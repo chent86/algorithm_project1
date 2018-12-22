@@ -8,8 +8,9 @@ int SA(data& m_data) {
   vector<int> facility_status(m_data.facility_num, 0);
   vector<int> assignment(m_data.customer_num, 0);
   vector<int> facility_used(m_data.facility_num, 0);
+  vector<int> m_random(m_data.facility_num, 1);
 
-  init_solution(assignment, facility_used, m_data); // 随机得到一个合法的初始解
+  init_solution(assignment, facility_used, m_data, m_random); // 随机得到一个合法的初始解
   result = evaluation(assignment, m_data);
   // cout << "init cost: " << result << endl;
 
