@@ -9,6 +9,7 @@ The total demand assigned to a facility must not exceedits capacity.
 ## solution
 
 (1) Hill Climbing(Local Search)
+
 (2) Simulate Anneal
 
 ## blog
